@@ -10,7 +10,7 @@ bool isRunning = true;
 
 //Introduction
 Console.WriteLine("==================================");
-Console.WriteLine("== Expanse and Currency Tracker ==");
+Console.WriteLine("== Expense and Currency Tracker ==");
 Console.WriteLine("==================================");
 Console.WriteLine("\n\n\n\n");
 
@@ -34,9 +34,7 @@ while (isRunning)   {
 
     //If method to check if the user input is a valid decimal, and if not, set the unit cost to 0.00. this is entirely unnecessary, but doing it anyway.
     Console.WriteLine("What is the Unit Cost? (€): ");
-    if(!decimal.TryParse(Console.ReadLine() ?? "0.00", out decimal unitCost))    {
-        unitCost = 0;
-    }
+    decimal.TryParse(Console.ReadLine(), out decimal unitCost);
 
     //no if used. the TryParse outputs a 0 if empty anyway.
     Console.WriteLine("What is the quantity purchased?: ");
@@ -49,6 +47,7 @@ while (isRunning)   {
     Console.WriteLine($"Item Description: {itemDesc}");
     Console.WriteLine($"Unit Cost : {unitCost:C2}");
     Console.WriteLine($"Quantity Purchased: {quantityPurchased}");
+    Console.WriteLine($"Total Cost: {(unitCost * quantityPurchased):C2}");
     Console.WriteLine("========================================");
 
     //Acquiring confirmation to push the product to the tracker, and showing an appropriate message
@@ -65,4 +64,7 @@ while (isRunning)   {
     if (Console.ReadLine()?.ToUpper() == "N")    {
         isRunning = false;
     }
+
 }
+
+Console.WriteLine("\nThank you for using Expense Tracker. Goodbye!");
