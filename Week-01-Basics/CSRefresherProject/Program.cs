@@ -1,5 +1,9 @@
 ﻿// Week 1 Project :: Expense and Currency Tracker
 
+//so the print later can output the euro symbol
+Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+
 //Variables
 string userName = string.Empty;
 bool isRunning = true;
@@ -16,7 +20,7 @@ while (string.IsNullOrEmpty(userName)) {
 }
 
 
-Console.WriteLine("Hello, " + userName + "!");
+Console.WriteLine($"Hello, {userName}!");
 
 
 while (isRunning)   {
@@ -24,20 +28,27 @@ while (isRunning)   {
     Console.WriteLine("\n\n\n\n");
     Console.WriteLine("What is the Item ID?: ");
     string itemID = Console.ReadLine() ?? "0";
+
     Console.WriteLine("What is the ItemDescription?: ");
-    string itemDesc = Console.ReadLine() ?? "0";
+    string itemDesc = Console.ReadLine() ?? "N/A";
+
+    //If method to check if the user input is a valid decimal, and if not, set the unit cost to 0.00. this is entirely unnecessary, but doing it anyway.
     Console.WriteLine("What is the Unit Cost? (€): ");
-    decimal unitCostInput = decimal.TryParse(Console.ReadLine() ?? "0", out decimal unitCost) ? unitCost : 0;
+    if(!decimal.TryParse(Console.ReadLine() ?? "0.00", out decimal unitCost))    {
+        unitCost = 0;
+    }
+
+    //no if used. the TryParse outputs a 0 if empty anyway.
     Console.WriteLine("What is the quantity purchased?: ");
-    int quantityPurchased = int.Parse(Console.ReadLine() ?? "0");
+    int.TryParse(Console.ReadLine(), out int quantityPurchased);
 
     //Confirming the details entered are correct
     Console.WriteLine("========================================");
     Console.WriteLine("\n\n\n**" + userName + " is adding the following product to the tracker: **");
-    Console.WriteLine("Item ID: " + itemID);
-    Console.WriteLine("Item Description: " + itemDesc);
-    Console.WriteLine("Unit Cost (EURO): " + unitCostInput);
-    Console.WriteLine("Quantity Purchased: " + quantityPurchased);
+    Console.WriteLine($"Item ID: {itemID}");
+    Console.WriteLine($"Item Description: {itemDesc}");
+    Console.WriteLine($"Unit Cost : {unitCost:C2}");
+    Console.WriteLine($"Quantity Purchased: {quantityPurchased}");
     Console.WriteLine("========================================");
 
     //Acquiring confirmation to push the product to the tracker, and showing an appropriate message
