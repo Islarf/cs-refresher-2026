@@ -32,7 +32,6 @@ while (isRunning)   {
     Console.WriteLine("What is the ItemDescription?: ");
     string itemDesc = Console.ReadLine() ?? "N/A";
 
-    //If method to check if the user input is a valid decimal, and if not, set the unit cost to 0.00. this is entirely unnecessary, but doing it anyway.
     Console.WriteLine("What is the Unit Cost? (€): ");
     decimal.TryParse(Console.ReadLine(), out decimal unitCost);
 
