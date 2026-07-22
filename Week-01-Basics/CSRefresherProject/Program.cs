@@ -127,7 +127,8 @@ public class ProductManager
     {
         Console.WriteLine("\n-- Add a Product --");
         Console.Write("Enter the Item ID : ");
-        string id = Console.ReadLine() ?? "-1";
+        int itemID;
+        while (!int.TryParse(Console.ReadLine(), out itemID) || !DoesItemExist(itemID.ToString())) {}
         //here we can clarify if the item ID already exists
         Console.Write("Enter Description : ");
         string desc = Console.ReadLine() ?? "N/A";
@@ -199,26 +200,13 @@ public class ProductManager
 
     }
 
-    public bool DoesItemExist(string itemId = "", string itemDesc = "")
+    public bool DoesItemExist(string itemId)
     {
         //if both inputs are empty, exit the method and return false
-        if (string.IsNullOrEmpty(itemId) && string.IsNullOrEmpty(itemDesc))
-        {
-            Console.WriteLine("CONSOLE ERROR: No search term provided.");
-            return false;
-        }
-        //this was obtained from gemini and am trying to understand how it works.
-        if(_products.Any(p =>
-                (!string.IsNullOrEmpty(itemId) && p.ItemID.Equals(itemId, StringComparison.OrdinalIgnoreCase)) ||
-                (!string.IsNullOrEmpty(itemDesc) && p.ItemDesc.Equals(itemDesc, StringComparison.OrdinalIgnoreCase))
-            ))
-        {
-            //if we reach here, the product exists
-            return true;
-        }
-        //if we reach here, the product does not exist
-        Console.WriteLine("Product not found.");
-        return false;
+        if (string.IsNullOrEmpty(itemId)) return false;
+        
+        return _products.Any(p => p.ItemID.Equals(itemId, StringComparison.OrdinalIgnoreCase));)
+        
     }
 
     public void RemoveProduct_Console()
