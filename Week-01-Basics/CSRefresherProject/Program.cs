@@ -126,10 +126,15 @@ public class ProductManager
     public void AddProduct_Console()
     {
         Console.WriteLine("\n-- Add a Product --");
+        //Item ID, and duplication handling
         Console.Write("Enter the Item ID : ");
         int itemID;
-        while (!int.TryParse(Console.ReadLine(), out itemID) || !DoesItemExist(itemID.ToString())) {}
-        //here we can clarify if the item ID already exists
+        while (!int.TryParse(Console.ReadLine(), out itemID) || !DoesItemExist(itemID.ToString(), _products))
+        {
+            Console.Write("Invalid ID, or Item ID already exists. Enter a unique numeric Item ID : ");
+        }
+
+        //Description, Unit Cost, and Quantity
         Console.Write("Enter Description : ");
         string desc = Console.ReadLine() ?? "N/A";
         Console.Write("Enter Unit Cost : ");
@@ -140,13 +145,14 @@ public class ProductManager
         }
         Console.Write("Enter Quantity : ");
         int quantity;
-        while(!int.TryParse(Console.ReadLine(), out quantity) || quantity < 0) {
+        while (!int.TryParse(Console.ReadLine(), out quantity) || quantity < 0)
+        {
             Console.WriteLine("Invalid input. Please enter a valid quantity (0 or greater).");
         }
 
         Product newProduct = new Product
         {
-            ItemID = id,
+            ItemID = "" + itemID,
             ItemDesc = desc,
             UnitCost = cost,
             Quantity = quantity
@@ -166,7 +172,7 @@ public class ProductManager
     public bool SearchProducts_Console()
     {
         Console.WriteLine("\n-- Search Products --");
-        if(_products.Count == 0)
+        if (_products.Count == 0)
         {
             Console.WriteLine("No products in the tracker.");
             return false;
@@ -184,34 +190,40 @@ public class ProductManager
         else
         {
             Console.WriteLine($"\nFound {results.Count} matching product(s): ");
-            DisplayProduct(results);
+            DisplayProducts(results);
         }
         return true;
     }
 
-    public void DisplayProduct(List<Product> products)
+    public void DisplayProducts(List<Product> products)
     {
         Console.WriteLine("----------------------------------------------");
         foreach (Product p in products)
         {
-            Console.WriteLine($"ID: {p.ItemID} || , Description: {p.ItemDesc} || , Unit Cost: {p.UnitCost} || , Quantity: {p.Quantity} ||, Total Cost: {p.TotalCost}");
+            DisplayProduct(p);
         }
         Console.WriteLine("----------------------------------------------");
 
     }
 
-    public bool DoesItemExist(string itemId)
+    public void DisplayProduct(Product p)
+    {
+        Console.WriteLine($"ID: {p.ItemID} ||, Description: {p.ItemDesc} ||, Unit Cost: {p.UnitCost} ||, Quantity: {p.Quantity} ||, Total Cost: {p.TotalCost}");
+    }
+
+    public bool DoesItemExist(string itemId, List<Product> productList)
     {
         //if both inputs are empty, exit the method and return false
-        if (string.IsNullOrEmpty(itemId)) return false;
-        
-        return _products.Any(p => p.ItemID.Equals(itemId, StringComparison.OrdinalIgnoreCase));)
-        
+        if (string.IsNullOrEmpty(itemId) || productList == null) return false;
+
+        return productList.Any(p => p.ItemID.Equals(itemId, StringComparison.OrdinalIgnoreCase));
     }
+
+
 
     public void RemoveProduct_Console()
     {
-        
+
         Console.WriteLine("\n-- Remove a Product --");
         //1: check if the product list is empty
         if (_products.Count == 0)
@@ -219,14 +231,13 @@ public class ProductManager
             Console.WriteLine("No products in the tracker.");
             return;
         }
-        //2:Create a results list to loop until the search finds something
-        List<Product> results = new List<Product>();
 
+        //2:Search for products by ID / Desc
+        List<Product> results = new List<Product>();
         while (results.Count == 0)
         {
-            //3: Prompt the user for the search term
             Console.Write("Enter the Item ID or Product Description of the product to remove (Press ENTER to cancel): ");
-            string searchTerm = Console.ReadLine()?.Trim().ToLower() ?? "";
+            string searchTerm = Console.ReadLine()?.Trim() ?? "";
             //2.a: check if the user wants to cancel the removal
             if (string.IsNullOrEmpty(searchTerm))
             {
@@ -234,35 +245,62 @@ public class ProductManager
                 return;
             }
             //4: Search for the product(s) in the list
+
             results = _products
-                .Where(p => p.ItemID.ToLower().Contains(searchTerm) || p.ItemDesc.ToLower().Contains(searchTerm))
+                .Where(p => p.ItemID.ToLower().Equals(searchTerm) || p.ItemDesc.ToLower().Contains(searchTerm))
                 .ToList();
             if (results.Count == 0)
             {
-                Console.WriteLine("\n***No matching products found. Please try again.***\n\n");
+                Console.WriteLine($"\n***No matching products found for '{searchTerm}'. Please try again.***\n\n");
             }
         }
-        //5: Display the matching products and ask for confirmation to remove
-        DisplayProduct(results);
-        string prompt = results.Count >1 
-            ? "*** ARE YOU SURE YOU WANT TO REMOVE THESE PRODUCTS? ***" 
-            : "*** ARE YOU SURE YOU WANT TO REMOVE THIS PRODUCT? ***";
-        if (ConsoleHelper.GetUserConfirmation(prompt))
+        //1: Handle multiple (description) matches by narrowing to one specific item ID
+        Product productToRemove = new Product();
+
+        if (results.Count() > 1)
         {
-            foreach (Product p in results.ToList())
+            Console.WriteLine($"*** {results.Count} products were found matching your search. ***");
+            DisplayProducts(results);
+
+            string targetId = "";
+            while (true)
             {
-                _products.Remove(p);
-                Console.WriteLine($"Product {p.ItemID} : {p.ItemDesc} removed from the tracker.");
+                Console.Write("Multiple items found. Enter the exact Item ID of the item to remove (Press ENTER to cancel): ");
+                targetId = (Console.ReadLine()?.Trim() ?? "").Trim();
+                if (string.IsNullOrEmpty(targetId))
+                {
+                    Console.WriteLine("Product removal cancelled.");
+                    return;
+                }
+
+                //Check if the entered ID exists in the results
+                if (DoesItemExist(targetId, results))
+                {
+                    break;
+                }
+                productToRemove = results.First(p => p.ItemID.Equals(targetId, StringComparison.OrdinalIgnoreCase));
             }
         }
         else
         {
-            Console.WriteLine("Product removal cancelled.");
-            return;
+            productToRemove = results[0];
         }
 
+        Console.WriteLine($"You have selected to remove the product: ");
+        DisplayProduct(productToRemove);
+
+        if (ConsoleHelper.GetUserConfirmation("Are you sure you want to remove this product from the tracker?"))
+        {
+            _products.Remove(productToRemove);
+            Console.WriteLine($"Product {productToRemove.ItemID} : {productToRemove.ItemDesc} removed from the tracker.");
+        }
+        else
+        {
+            Console.WriteLine("Product removal cancelled.");
+        }
     }
 }
+
 
 
 
