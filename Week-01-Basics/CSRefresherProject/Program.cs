@@ -19,27 +19,29 @@ while (isRunning)
 {
     RunMenu();
 }
+Console.WriteLine("\nThank you for using Expense Tracker. Goodbye!");
+
 
 
 void NameEntry()
 {
     while (string.IsNullOrEmpty(userName))
     {
-        Console.WriteLine("Please enter your employee name?: ");
+        Console.Write("Please enter your employee name?: ");
         userName = Console.ReadLine() ?? "";
     }
 }
 
 
-void RunMenu() {
+void RunMenu()
+{
 
     //MainMenu
     Console.WriteLine("What would you like to do?");
     Console.WriteLine("1: Search for a product");
     Console.WriteLine("2: Add a product to the tracker");
-    Console.WriteLine("3: Search for multiple products");
-    Console.WriteLine("4: Remove a product from the tracker");
-    Console.WriteLine("5: Exit the program");
+    Console.WriteLine("3: Remove a product from the tracker");
+    Console.WriteLine("4: Exit the program");
 
     String MenuChoice = Console.ReadLine() ?? "0";
     switch(MenuChoice)
@@ -49,14 +51,13 @@ void RunMenu() {
             break;
         case "2":
             Console.WriteLine("You have chosen to add a product to the tracker.");
+            ProductManager newProduct = new ProductManager();
+            newProduct.AddProduct_Console();
             break;
         case "3":
-            Console.WriteLine("You have chosen to search for multiple products.");
-            break;
-        case "4":
             Console.WriteLine("You have chosen to remove a product from the tracker.");
             break;
-        case "5":
+        case "4":
             Console.WriteLine("You have chosen to exit the program.");
             isRunning = false;
             break;
@@ -67,4 +68,41 @@ void RunMenu() {
 
 }
 
-Console.WriteLine("\nThank you for using Expense Tracker. Goodbye!");
+public class Product
+{
+    public string ItemID { get; set; } = "";
+    public string ItemDesc { get; set; } = "";
+    public decimal UnitCost { get; set; }
+    public int Quantity { get; set; }
+    public decimal TotalCost => UnitCost * Quantity;
+}
+
+public class ProductManager
+{
+    private List<Product> _products = new List<Product>();
+
+    public void AddProduct_Console()
+    {
+        Console.WriteLine("\n-- Add a Product --");
+        Console.Write("Enter the Item ID: ");
+        string id = Console.ReadLine() ?? "-1";
+        //here we can clarify if the item ID already exists
+        Console.Write("Enter Description ");
+        string desc = Console.ReadLine() ?? "N/A";
+        Console.Write("Enter Unit Cost: ");
+        decimal.TryParse(Console.ReadLine(), out decimal o_cost);
+        Console.Write("Enter Quantity: ");
+        int.TryParse(Console.ReadLine(),out int o_quantity);
+        
+        Product newProduct = new Product
+        {
+            ItemID = id,
+            ItemDesc = desc,
+            UnitCost = o_cost,
+            Quantity = o_quantity
+        };
+        _products.Add(newProduct);
+        Console.WriteLine($"Added {newProduct.ItemDesc} successfully");
+    }
+
+}
