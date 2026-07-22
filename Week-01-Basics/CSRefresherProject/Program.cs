@@ -1,8 +1,10 @@
 ﻿// Week 1 Project :: Inventory and Expense Tracker
+
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 
 Menu app = new Menu();
 app.Start();
+
 
 //AppUI
 public class Menu
@@ -56,8 +58,7 @@ public class Menu
                 while(isAdding)
                 {
                     _productManager.AddProduct_Console();
-                    Console.Write("\nWould you like to add another product? (Y/N) : ");
-                    if(Console.ReadLine()?.Trim().ToUpper() != "Y")
+                    if(!ConsoleHelper.GetUserConfirmation("Would you like to add another product?"))
                     {
                         isAdding = false;
                     }
@@ -74,6 +75,18 @@ public class Menu
                 Console.WriteLine("Invalid choice. Please try again.");
                 break;
         }
+    }
+}
+
+//Other useful console helpers i need
+public static class ConsoleHelper
+{
+    public static bool GetUserConfirmation(string prompt)
+    {
+        Console.Write($"{prompt} (Y/N) : ");
+        return (Console.ReadLine()?.Trim().ToUpper() == "Y"
+            ? true
+            : false);
     }
 }
 
@@ -113,8 +126,7 @@ public class ProductManager
             Quantity = o_quantity
         };
         Console.WriteLine($"You created the product: {newProduct.ItemID} : {newProduct.ItemDesc}, Quantity: {newProduct.Quantity}, Total Cost: {newProduct.TotalCost}");
-        Console.Write("Confirm that you would like to add this Product to the tracker? (Y/N) : ");
-        if (Console.ReadLine()?.ToUpper() == "Y")
+        if (ConsoleHelper.GetUserConfirmation("Confirm that you would like to add this Product to the tracker?"))
         {
             _products.Add(newProduct);
             Console.WriteLine("Product added to the tracker.");
@@ -125,13 +137,13 @@ public class ProductManager
         }
     }
 
-    public void SearchProducts_Console()
+    public bool SearchProducts_Console()
     {
         Console.WriteLine("\n-- Search Products --");
         if(_products.Count == 0)
         {
             Console.WriteLine("No products in the tracker.");
-            return;
+            return false;
         }
         Console.Write("Enter the item ID or the Descrption search term (or press Enter to view all) : ");
         string query = (Console.ReadLine() ?? "").Trim().ToLower();
@@ -141,17 +153,82 @@ public class ProductManager
 
         if (results.Count == 0)
         {
-            Console.WriteLine($"No products found matching '{query}");
-;       }
+            Console.WriteLine($"No products found matching '{query}'.");
+        }
         else
         {
             Console.WriteLine($"\nFound {results.Count} matching product(s): ");
-            Console.WriteLine("----------------------------------------------");
+            DisplayProduct(results);
+        }
+        return true;
+    }
+
+    public void DisplayProduct(List<Product> products)
+    {
+        Console.WriteLine("----------------------------------------------");
+        foreach (Product p in products)
+        {
+            Console.WriteLine($"ID: {p.ItemID} || , Description: {p.ItemDesc} || , Unit Cost: {p.UnitCost} || , Quantity: {p.Quantity} ||, Total Cost: {p.TotalCost}");
+        }
+        Console.WriteLine("----------------------------------------------");
+
+    }
+
+    public void RemoveProduct_Console()
+    {
+        
+        Console.WriteLine("\n-- Remove a Product --");
+        //1: check if the product list is empty
+        if (_products.Count == 0)
+        {
+            Console.WriteLine("No products in the tracker.");
+            return;
+        }
+        //2:Create a results list to loop until the search finds something
+        List<Product> results = new List<Product>();
+
+        while (results.Count == 0)
+        {
+            //3: Prompt the user for the search term
+            Console.Write("Enter the Item ID or Product Description of the product to remove (Press ENTER to cancel): ");
+            string searchTerm = Console.ReadLine()?.Trim().ToLower() ?? "";
+            //2.a: check if the user wants to cancel the removal
+            if (string.IsNullOrEmpty(searchTerm))
+            {
+                Console.WriteLine("Product removal cancelled.\n\n***Returning to the main menu.***");
+                return;
+            }
+            //4: Search for the product(s) in the list
+            results = _products
+                .Where(p => p.ItemID.ToLower().Contains(searchTerm) || p.ItemDesc.ToLower().Contains(searchTerm))
+                .ToList();
+            if (results.Count == 0)
+            {
+                Console.WriteLine("\n***No matching products found. Please try again.***\n\n");
+            }
+        }
+        //5: Display the matching products and ask for confirmation to remove
+        DisplayProduct(results);
+        string prompt = results.Count >1 
+            ? "*** ARE YOU SURE YOU WANT TO REMOVE THESE PRODUCTS? ***" 
+            : "*** ARE YOU SURE YOU WANT TO REMOVE THIS PRODUCT? ***";
+        if (ConsoleHelper.GetUserConfirmation(prompt))
+        {
             foreach (Product p in results)
             {
-                Console.WriteLine($"ID: {p.ItemID} || , Description: {p.ItemDesc} || , Unit Cost: {p.UnitCost} || , Quantity: {p.Quantity} ||, Total Cost: {p.TotalCost}");
+                _products.Remove(p);
+                Console.WriteLine($"Product {p.ItemID} : {p.ItemDesc} removed from the tracker.");
             }
-            Console.WriteLine("----------------------------------------------");
         }
+        else
+        {
+            Console.WriteLine("Product removal cancelled.");
+            return;
+        }
+
     }
 }
+
+
+
+
