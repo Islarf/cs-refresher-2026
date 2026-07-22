@@ -129,7 +129,7 @@ public class ProductManager
         //Item ID, and duplication handling
         Console.Write("Enter the Item ID : ");
         int itemID;
-        while (!int.TryParse(Console.ReadLine(), out itemID) || !DoesItemExist(itemID.ToString(), _products))
+        while (!int.TryParse(Console.ReadLine(), out itemID) || !DoesItemExist(itemID.ToString()))
         {
             Console.Write("Invalid ID, or Item ID already exists. Enter a unique numeric Item ID : ");
         }
@@ -195,6 +195,11 @@ public class ProductManager
         return true;
     }
 
+    public void DisplayProduct(Product p)
+    {
+        Console.WriteLine($"ID: {p.ItemID} ||, Description: {p.ItemDesc} ||, Unit Cost: {p.UnitCost} ||, Quantity: {p.Quantity} ||, Total Cost: {p.TotalCost}");
+    }
+
     public void DisplayProducts(List<Product> products)
     {
         Console.WriteLine("----------------------------------------------");
@@ -206,10 +211,10 @@ public class ProductManager
 
     }
 
-    public void DisplayProduct(Product p)
-    {
-        Console.WriteLine($"ID: {p.ItemID} ||, Description: {p.ItemDesc} ||, Unit Cost: {p.UnitCost} ||, Quantity: {p.Quantity} ||, Total Cost: {p.TotalCost}");
-    }
+ 
+
+    //default for the _products object
+    public bool DoesItemExist(string itemId) => DoesItemExist(itemId, _products);
 
     public bool DoesItemExist(string itemId, List<Product> productList)
     {
