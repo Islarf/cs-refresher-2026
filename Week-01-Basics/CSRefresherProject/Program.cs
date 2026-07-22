@@ -132,16 +132,23 @@ public class ProductManager
         Console.Write("Enter Description : ");
         string desc = Console.ReadLine() ?? "N/A";
         Console.Write("Enter Unit Cost : ");
-        decimal.TryParse(Console.ReadLine(), out decimal o_cost);
+        decimal cost;
+        while (!decimal.TryParse(Console.ReadLine(), out cost) || cost <= 0)
+        {
+            Console.WriteLine("Invalid input. Please enter a valid unit cost (greater than 0).");
+        }
         Console.Write("Enter Quantity : ");
-        int.TryParse(Console.ReadLine(), out int o_quantity);
+        int quantity;
+        while(!int.TryParse(Console.ReadLine(), out quantity) || quantity < 0) {
+            Console.WriteLine("Invalid input. Please enter a valid quantity (0 or greater).");
+        }
 
         Product newProduct = new Product
         {
             ItemID = id,
             ItemDesc = desc,
-            UnitCost = o_cost,
-            Quantity = o_quantity
+            UnitCost = cost,
+            Quantity = quantity
         };
         Console.WriteLine($"You created the product: {newProduct.ItemID} : {newProduct.ItemDesc}, Quantity: {newProduct.Quantity}, Total Cost: {newProduct.TotalCost}");
         if (ConsoleHelper.GetUserConfirmation("Confirm that you would like to add this Product to the tracker?"))
@@ -192,6 +199,28 @@ public class ProductManager
 
     }
 
+    public bool DoesItemExist(string itemId = "", string itemDesc = "")
+    {
+        //if both inputs are empty, exit the method and return false
+        if (string.IsNullOrEmpty(itemId) && string.IsNullOrEmpty(itemDesc))
+        {
+            Console.WriteLine("CONSOLE ERROR: No search term provided.");
+            return false;
+        }
+        //this was obtained from gemini and am trying to understand how it works.
+        if(_products.Any(p =>
+                (!string.IsNullOrEmpty(itemId) && p.ItemID.Equals(itemId, StringComparison.OrdinalIgnoreCase)) ||
+                (!string.IsNullOrEmpty(itemDesc) && p.ItemDesc.Equals(itemDesc, StringComparison.OrdinalIgnoreCase))
+            ))
+        {
+            //if we reach here, the product exists
+            return true;
+        }
+        //if we reach here, the product does not exist
+        Console.WriteLine("Product not found.");
+        return false;
+    }
+
     public void RemoveProduct_Console()
     {
         
@@ -232,7 +261,7 @@ public class ProductManager
             : "*** ARE YOU SURE YOU WANT TO REMOVE THIS PRODUCT? ***";
         if (ConsoleHelper.GetUserConfirmation(prompt))
         {
-            foreach (Product p in results)
+            foreach (Product p in results.ToList())
             {
                 _products.Remove(p);
                 Console.WriteLine($"Product {p.ItemID} : {p.ItemDesc} removed from the tracker.");
