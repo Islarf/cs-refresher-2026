@@ -129,7 +129,7 @@ public class ProductManager
         //Item ID, and duplication handling
         Console.Write("Enter the Item ID : ");
         int itemID;
-        while (!int.TryParse(Console.ReadLine(), out itemID) || !DoesItemExist(itemID.ToString()))
+        while (!int.TryParse(Console.ReadLine(), out itemID) || DoesItemExist(itemID.ToString()))
         {
             Console.Write("Invalid ID, or Item ID already exists. Enter a unique numeric Item ID : ");
         }
