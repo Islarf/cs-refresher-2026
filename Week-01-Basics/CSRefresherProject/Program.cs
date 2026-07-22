@@ -111,17 +111,16 @@ public class ProductManager
             UnitCost = o_cost,
             Quantity = o_quantity
         };
-        _products.Add(newProduct);
         Console.WriteLine($"You created the product: {newProduct.ItemID} : {newProduct.ItemDesc}, Quantity: {newProduct.Quantity}, Total Cost: {newProduct.TotalCost}");
         Console.WriteLine("Confirm that you would like to add this Product to the tracker? (Y/N)");
         if (Console.ReadLine()?.ToUpper() == "Y")
         {
+            _products.Add(newProduct);
             Console.WriteLine("Product added to the tracker.");
         }
         else
         {
-            _products.Remove(newProduct);
-            Console.WriteLine("Product not added to the tracker.");
+            Console.WriteLine("Product entry discarded.");
         }
     }
 
