@@ -1,84 +1,82 @@
 ﻿// Week 1 Project :: Inventory and Expense Tracker
 
-//so the print later can output the euro symbol
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 
+Menu app = new Menu();
+app.Start();
 
-//Variables
-string userName = string.Empty;
-bool isRunning = true;
-
-//Introduction
-Console.WriteLine("==================================");
-Console.WriteLine("== Inventory and Expense Tracker ==");
-Console.WriteLine("==================================");
-Console.WriteLine("\n\n\n\n");
-NameEntry();
-Console.WriteLine($"Hello, {userName}!");
-while (isRunning)
+//AppUI
+public class Menu
 {
-    RunMenu();
-}
-Console.WriteLine("\nThank you for using Expense Tracker. Goodbye!");
+    private ProductManager _productManager = new ProductManager();
+    private string _userName = string.Empty;
+    private bool _isRunning = true;
 
-
-
-void NameEntry()
-{
-    while (string.IsNullOrEmpty(userName))
+    public void Start()
     {
-        Console.Write("Please enter your employee name?: ");
-        userName = Console.ReadLine() ?? "";
+        //Introduction
+        Console.WriteLine("==================================");
+        Console.WriteLine("== Inventory and Expense Tracker ==");
+        Console.WriteLine("==================================");
+        Console.WriteLine("\n\n\n\n");
+        GetUserName();
+        Console.WriteLine($"Hello, {_userName}!");
+        while (_isRunning)
+        {
+            DisplayAndHandleMenu();
+        }
+        Console.WriteLine($"*** Thank you for using Expense Tracker. Goodbye! {_userName} ***");
     }
-}
+    private void GetUserName()
+    {
+        while (string.IsNullOrEmpty(_userName))
+        {
+            Console.Write("Please enter your employee name: ");
+            _userName = Console.ReadLine() ?? "";
+        }
+    }
 
-
-void RunMenu()
-{
-
-    //MainMenu
-    Console.WriteLine("What would you like to do?");
-    Console.WriteLine("1: Search for a product");
-    Console.WriteLine("2: Add a product to the tracker");
-    Console.WriteLine("3: Remove a product from the tracker");
-    Console.WriteLine("4: Exit the program");
-
-    String MenuChoice = Console.ReadLine() ?? "0";
-    while (MenuChoice != "-1") {
-        switch (MenuChoice)
+    //Display the menu and handle user input
+    private void DisplayAndHandleMenu()
+    {
+        Console.WriteLine("\nWhat would you like to do?");
+        Console.WriteLine("1: Search for a product");
+        Console.WriteLine("2: Add a product to the tracker");
+        Console.WriteLine("3: Remove a product from the tracker");
+        Console.WriteLine("4: Exit the program");
+        string choice = Console.ReadLine() ?? "0";
+        switch (choice)
         {
             case "1":
                 Console.WriteLine("You have chosen to search for a product.");
-                MenuChoice = "-1";
                 break;
             case "2":
-                Console.WriteLine("You have chosen to add a product to the tracker.");
-                ProductManager newProduct = new ProductManager();
-                newProduct.AddProduct_Console();
-                Console.WriteLine("Would you like to add another product? (Y/N)");
-                if (Console.ReadLine()?.ToUpper() != "Y")
+                bool isAdding = true;
+                while(isAdding)
                 {
-                    MenuChoice = "-1";
+                    _productManager.AddProduct_Console();
+                    Console.WriteLine("\nWould you like to add another product? (Y/N)");
+                    if(Console.ReadLine()?.Trim().ToUpper() != "Y")
+                    {
+                        isAdding = false;
+                    }
                 }
-
                 break;
             case "3":
                 Console.WriteLine("You have chosen to remove a product from the tracker.");
-                MenuChoice = "-1";
                 break;
             case "4":
                 Console.WriteLine("You have chosen to exit the program.");
-                MenuChoice = "-1";
-                isRunning = false;
+                _isRunning = false;
                 break;
             default:
                 Console.WriteLine("Invalid choice. Please try again.");
                 break;
         }
     }
-
 }
 
+//Product class to hold product information
 public class Product
 {
     public string ItemID { get; set; } = "";
@@ -88,6 +86,7 @@ public class Product
     public decimal TotalCost => UnitCost * Quantity;
 }
 
+//Product Manager class to manage the list of products
 public class ProductManager
 {
     private List<Product> _products = new List<Product>();
