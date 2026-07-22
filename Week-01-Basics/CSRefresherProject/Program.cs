@@ -65,7 +65,15 @@ public class Menu
                 }
                 break;
             case "3":
-                Console.WriteLine("You have chosen to remove a product from the tracker.");
+                bool isRemoving = true;
+                while(isRemoving)
+                {
+                    _productManager.RemoveProduct_Console();
+                    if(!ConsoleHelper.GetUserConfirmation("Would you like to remove another product?"))
+                    {
+                        isRemoving = false;
+                    }
+                }
                 break;
             case "4":
                 Console.WriteLine("You have chosen to exit the program.");
@@ -83,10 +91,20 @@ public static class ConsoleHelper
 {
     public static bool GetUserConfirmation(string prompt)
     {
-        Console.Write($"{prompt} (Y/N) : ");
-        return (Console.ReadLine()?.Trim().ToUpper() == "Y"
-            ? true
-            : false);
+        while (true)
+        {
+            Console.Write($"{prompt} (Y/N) : ");
+            string input = Console.ReadLine()?.Trim().ToUpper() ?? "";
+            if (input == "Y")
+            {
+                return true;
+            }
+            if (input == "N")
+            {
+                return false;
+            }
+            Console.WriteLine("Invalid input. Please enter 'Y' for Yes or 'N' for No.\n");
+        }
     }
 }
 
