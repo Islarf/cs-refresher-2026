@@ -13,17 +13,25 @@ Console.WriteLine("==================================");
 Console.WriteLine("== Inventory and Expense Tracker ==");
 Console.WriteLine("==================================");
 Console.WriteLine("\n\n\n\n");
-
-while (string.IsNullOrEmpty(userName)) {
-    Console.WriteLine("Please enter your employee name?: ");
-    userName = Console.ReadLine() ?? "";
+NameEntry();
+Console.WriteLine($"Hello, {userName}!");
+while (isRunning)
+{
+    RunMenu();
 }
 
 
-Console.WriteLine($"Hello, {userName}!");
+void NameEntry()
+{
+    while (string.IsNullOrEmpty(userName))
+    {
+        Console.WriteLine("Please enter your employee name?: ");
+        userName = Console.ReadLine() ?? "";
+    }
+}
 
 
-while (isRunning)   {
+void RunMenu() {
 
     //MainMenu
     Console.WriteLine("What would you like to do?");
