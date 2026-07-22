@@ -136,7 +136,9 @@ public class ProductManager
 
         //Description, Unit Cost, and Quantity
         Console.Write("Enter Description : ");
-        string desc = Console.ReadLine() ?? "N/A";
+        string desc = Console.ReadLine()?.Trim() ?? "";
+        if (string.IsNullOrWhiteSpace(desc)) desc = "N/A";
+
         Console.Write("Enter Unit Cost : ");
         decimal cost;
         while (!decimal.TryParse(Console.ReadLine(), out cost) || cost <= 0)
@@ -242,7 +244,7 @@ public class ProductManager
         while (results.Count == 0)
         {
             Console.Write("Enter the Item ID or Product Description of the product to remove (Press ENTER to cancel): ");
-            string searchTerm = Console.ReadLine()?.Trim() ?? "";
+            string searchTerm = Console.ReadLine()?.Trim().ToLower() ?? "";
             //2.a: check if the user wants to cancel the removal
             if (string.IsNullOrEmpty(searchTerm))
             {
@@ -281,9 +283,10 @@ public class ProductManager
                 //Check if the entered ID exists in the results
                 if (DoesItemExist(targetId, results))
                 {
+                    productToRemove = results.First(p => p.ItemID.Equals(targetId, StringComparison.OrdinalIgnoreCase));
                     break;
                 }
-                productToRemove = results.First(p => p.ItemID.Equals(targetId, StringComparison.OrdinalIgnoreCase));
+                Console.WriteLine("Invalid ID or item not found in search results. Please try again.\n");
             }
         }
         else
