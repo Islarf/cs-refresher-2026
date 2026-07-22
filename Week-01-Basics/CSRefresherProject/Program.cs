@@ -1,5 +1,4 @@
 ﻿// Week 1 Project :: Inventory and Expense Tracker
-
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 
 Menu app = new Menu();
@@ -39,23 +38,25 @@ public class Menu
     //Display the menu and handle user input
     private void DisplayAndHandleMenu()
     {
-        Console.WriteLine("\nWhat would you like to do?");
+        Console.WriteLine("\n***What would you like to do?***\n");
         Console.WriteLine("1: Search for a product");
         Console.WriteLine("2: Add a product to the tracker");
         Console.WriteLine("3: Remove a product from the tracker");
         Console.WriteLine("4: Exit the program");
+        Console.Write("Enter your choice (1-4): ");
         string choice = Console.ReadLine() ?? "0";
         switch (choice)
         {
             case "1":
                 Console.WriteLine("You have chosen to search for a product.");
+                _productManager.SearchProducts_Console();
                 break;
             case "2":
                 bool isAdding = true;
                 while(isAdding)
                 {
                     _productManager.AddProduct_Console();
-                    Console.WriteLine("\nWould you like to add another product? (Y/N)");
+                    Console.Write("\nWould you like to add another product? (Y/N) : ");
                     if(Console.ReadLine()?.Trim().ToUpper() != "Y")
                     {
                         isAdding = false;
@@ -94,14 +95,14 @@ public class ProductManager
     public void AddProduct_Console()
     {
         Console.WriteLine("\n-- Add a Product --");
-        Console.Write("Enter the Item ID: ");
+        Console.Write("Enter the Item ID : ");
         string id = Console.ReadLine() ?? "-1";
         //here we can clarify if the item ID already exists
-        Console.Write("Enter Description ");
+        Console.Write("Enter Description : ");
         string desc = Console.ReadLine() ?? "N/A";
-        Console.Write("Enter Unit Cost: ");
+        Console.Write("Enter Unit Cost : ");
         decimal.TryParse(Console.ReadLine(), out decimal o_cost);
-        Console.Write("Enter Quantity: ");
+        Console.Write("Enter Quantity : ");
         int.TryParse(Console.ReadLine(), out int o_quantity);
 
         Product newProduct = new Product
@@ -112,7 +113,7 @@ public class ProductManager
             Quantity = o_quantity
         };
         Console.WriteLine($"You created the product: {newProduct.ItemID} : {newProduct.ItemDesc}, Quantity: {newProduct.Quantity}, Total Cost: {newProduct.TotalCost}");
-        Console.WriteLine("Confirm that you would like to add this Product to the tracker? (Y/N)");
+        Console.Write("Confirm that you would like to add this Product to the tracker? (Y/N) : ");
         if (Console.ReadLine()?.ToUpper() == "Y")
         {
             _products.Add(newProduct);
@@ -124,4 +125,33 @@ public class ProductManager
         }
     }
 
+    public void SearchProducts_Console()
+    {
+        Console.WriteLine("\n-- Search Products --");
+        if(_products.Count == 0)
+        {
+            Console.WriteLine("No products in the tracker.");
+            return;
+        }
+        Console.Write("Enter the item ID or the Descrption search term (or press Enter to view all) : ");
+        string query = (Console.ReadLine() ?? "").Trim().ToLower();
+        List<Product> results = _products
+            .Where(p => p.ItemID.ToLower().Contains(query) || p.ItemDesc.ToLower().Contains(query))
+            .ToList();
+
+        if (results.Count == 0)
+        {
+            Console.WriteLine($"No products found matching '{query}");
+;       }
+        else
+        {
+            Console.WriteLine($"\nFound {results.Count} matching product(s): ");
+            Console.WriteLine("----------------------------------------------");
+            foreach (Product p in results)
+            {
+                Console.WriteLine($"ID: {p.ItemID} || , Description: {p.ItemDesc} || , Unit Cost: {p.UnitCost} || , Quantity: {p.Quantity} ||, Total Cost: {p.TotalCost}");
+            }
+            Console.WriteLine("----------------------------------------------");
+        }
+    }
 }
